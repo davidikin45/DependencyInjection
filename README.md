@@ -2,6 +2,7 @@
 
 * [Microsoft Documentation](https://docs.microsoft.com/en-us/aspnet/core/fundamentals/dependency-injection?view=aspnetcore-2.2)
 * [Dependency Injection in ASP.NET Core](https://app.pluralsight.com/library/courses/aspdotnet-core-dependency-injection/table-of-contents)
+* [ASP.NET Dependency Injection Best Practices](https://medium.com/volosoft/asp-net-core-dependency-injection-best-practices-tips-tricks-c6e9c67f9d96?fbclid=IwAR2Bdh6IySRyWQgHOZITE_RvmeAlxV1GJFUHrIy5Y8tMuEF2GGo8FTWbziY)
 * If there are multiple registrations for the same service type the last registered type wins.
 * TryAdd will only register if there is not already a service defined for that service type.
 * services.TryAddEnumerable prevents duplication of service type. Useful for composite services which send notifications.
