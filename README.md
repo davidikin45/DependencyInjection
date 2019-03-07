@@ -78,6 +78,11 @@ public class Middleware
 * @inject AppSettings AppSettings
 
 ## Manaully creating scope
+
+* Enable Async Main
+
+![alt text](img/asyncmain.png "CDN")
+
 ```
 public class Program
 {
