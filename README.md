@@ -3,10 +3,6 @@
 * [Microsoft Documentation](https://docs.microsoft.com/en-us/aspnet/core/fundamentals/dependency-injection?view=aspnetcore-2.2)
 * [Dependency Injection in ASP.NET Core](https://app.pluralsight.com/library/courses/aspdotnet-core-dependency-injection/table-of-contents)
 * [ASP.NET Dependency Injection Best Practices](https://medium.com/volosoft/asp-net-core-dependency-injection-best-practices-tips-tricks-c6e9c67f9d96?fbclid=IwAR2Bdh6IySRyWQgHOZITE_RvmeAlxV1GJFUHrIy5Y8tMuEF2GGo8FTWbziY)
-* If there are multiple registrations for the same service type the last registered type wins.
-* TryAdd will only register if there is not already a service defined for that service type.
-* services.TryAddEnumerable prevents duplication of service type. Useful for composite services which send notifications.
-* Resolve multiple services with IEnumerable<IServiceType> or IServiceType[].
 * The most parameter rich constructor will be used to create object.
 
 ## Safe Registrations
@@ -20,6 +16,40 @@ services.Configure<AppSettings>(Configuration.GetSection("AppSettings"));
 services.AddTransient(sp => sp.GetService<IOptions<AppSettings>>().Value);
 
 var settings = Configuration.GetSection(sectionKey).Get<AppSettings>();
+```
+
+## Multiple Registrations
+* If there are multiple registrations for the same service type the last registered type wins.
+* TryAdd will only register if there is not already a service defined for that service type.
+* services.TryAddEnumerable prevents duplication of service type. Useful for composite services which send notifications.
+* Resolve multiple services with IEnumerable<IServiceType>, IServiceType[], servicePrvider.GetServices<INotificationService>(), servicePrvider.GetServices(typeof(INotificationService))
+
+```
+//Add EmailNotificationService once
+servcies.AddSingleton<INotificationService, EmailNotificationService>();
+servcies.TryAddSingleton<INotificationService, EmailNotificationService>();
+
+//Add EmailNotificationService twice. Last wins if calling servicePrvider.GetService or injecting INotificationService
+servcies.AddSingleton<INotificationService, EmailNotificationService>();
+servcies.AddSingleton<INotificationService, EmailNotificationService>();
+
+//Add EmailNotificationService only once
+services.TryAddEnumerable(ServiceDescriptor.Singleton<INotificationService, EmailNotificationService>());
+services.TryAddEnumerable(ServiceDescriptor.Singleton<INotificationService, EmailNotificationService>());
+```
+
+## Clear and Replace Registrations
+```
+services.RemoveAll<INotificationService>();
+services.Replace(ServiceDescriptor.Singleton<INotificationService, EmailNotificationService>());
+```
+
+## Type as Multiple Interfaces
+```
+services.AddSingleton<GreetingService>();
+
+servies.AddSingleton<IHomePageGreetingService>(sp => sp.GetRequiredService<GreetingService>());
+servies.AddSingleton<IGreetingService>(sp => sp.GetRequiredService<GreetingService>());
 ```
 
 ## Notifications
@@ -36,7 +66,7 @@ services.AddSingleton<INotificationService>(sp => new CompositeNotificationServi
 
 ## Open Generic Services
 ```
-services.AddSingleton(typeof(IInterface<>), typeof(Implementation<>));
+services.AddSingleton(typeof(IDistributedCache<>), typeof(DistributedCache<>));
 ```
 
 ## Extensions for Cleaner Code
