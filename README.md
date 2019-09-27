@@ -4,6 +4,7 @@
 * [Dependency Injection in ASP.NET Core](https://app.pluralsight.com/library/courses/aspdotnet-core-dependency-injection/table-of-contents)
 * [ASP.NET Dependency Injection Best Practices](https://medium.com/volosoft/asp-net-core-dependency-injection-best-practices-tips-tricks-c6e9c67f9d96?fbclid=IwAR2Bdh6IySRyWQgHOZITE_RvmeAlxV1GJFUHrIy5Y8tMuEF2GGo8FTWbziY)
 * The most parameter rich constructor will be used to create object.
+* When injecting IServiceProvider into a singleton it is the root provider so can't get scoped services.
 
 ## Safe Registrations
 * Singleton Service validation occurs in development to ensure scoped services aren't injected.
@@ -374,3 +375,8 @@ public class Startup
 	}
 }
 ```
+
+## Configuration
+* Use IOptions
+* For reloading inside non-singleton services use IOptionsSnapshot
+* For reloading inside singleton services use IOptionsMonitor. Inject and store IOptionsMonitor<Options> and use options.CurrentValue
