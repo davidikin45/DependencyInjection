@@ -377,14 +377,96 @@ public class Startup
 ```
 
 ## Configuration
-* .ValidateDataAnnotations validates config on first use. Better to use IStartupFilter to validate on application startup.
-* Use IOptions. Cannot register named instances.
-* For reloading inside non-singleton services use IOptionsSnapshot. Can register named instances.
-* For reloading inside singleton services use IOptionsMonitor. Inject and store IOptionsMonitor<Options> and use options.CurrentValue or register OnChange callback. Can register named instances.
+* .ValidateDataAnnotations and IValidateOptions validates config on first use. Better to use IStartupFilter to validate on application startup.
+* services.TryAddEnumerable(ServiceDescriptor.Singleton<IValidateIotions<OptionsClass>, OptionsValidationClass>());
+* Use Options.Create(); for Unit Testing
+* IOptionsMonitor<T> use:
 ```
 _options = options.CurrentValue;
 options.OnChange(config => {
 	_options = config;
 	logger.LogInformation("Configuration has been updated");
 });
+```
+
+![Options](img/options.png "Options")
+
+### IOptions
+* Does not support options reloading
+* Registered as a singleton in DI container
+* Values bound when first used
+* Can be injected into all service lifetimes
+* Does not support named options
+
+### IOptionsSnapshot
+* Supports reloading of configuration
+* Registered as scoped in DI container
+* Values may reload per request
+* Can not be injected into singleton services
+* Supports named options
+
+### IOptionsMonitor
+* Supports reloading of configuration
+* Registered as singleton b in DI container
+* Values are reloaded immediately
+* Can be injected into all service lifetimes
+* Supports named options
+
+### Providers
+1. appsettings.json
+2. appsettings.{environment}.json
+3. Local user secrets in development environment
+4. Environment variables
+5. Command line args
+6. Azure Key Vault/EF
+
+* Use the following to have control over order
+```
+.ConfigureAppConfiguration((ctx, builder) => {
+	builder.Sources.Clear();
+
+	var env = ctx.HostingEnvironment;
+	builder.AddJsonFile("appsettings.json", optional: true, reloadOnChange: true);
+
+	if(env.IsDevelopment() && !string.ISnullOrEmpty(env.ApplicationName))
+	{
+		var appAssembly = Assembly.Load(new AssemblyName(env.ApplicationName))
+		if(appAssembly != null)
+		{
+			builder.AddUserSecrets(appAssembly, optional: true);
+		}
+	}
+
+	var tokenProvider = new AzureServiceTokenProvider();
+	var kvClient = new KeyVaultClient((authority, resource, scope) => tokenProvider.KeyVaultTokenCallback(authority, resource, scope));
+	builder.AddAzureKeyVault($"https://{vaultName}.vault.azure.net", kvClient, new DefaultKeyVaultSecretManager());
+
+	builder.AddEnvironmentVariables();
+});
+```
+
+### Environment Variables
+* Command Line. set Section__Key=Value
+* Can also be set in launchSettings.json. "Section__Key" : "Value"
+
+### Command Line Args
+* dotnet run --Section:Key Value
+
+### User Secrets
+* dotnet user-secrets list
+* Good for Development envvironment
+
+### Azure Key Vault
+* Good for production
+
+### EF Core
+* Section:Key
+```
+public class ConfigurationEntry
+{
+	[Key]
+	public string Key {get; set;}
+
+	public string Value {get; set;}
+}
 ```
