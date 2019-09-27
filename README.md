@@ -379,4 +379,11 @@ public class Startup
 ## Configuration
 * Use IOptions
 * For reloading inside non-singleton services use IOptionsSnapshot
-* For reloading inside singleton services use IOptionsMonitor. Inject and store IOptionsMonitor<Options> and use options.CurrentValue
+* For reloading inside singleton services use IOptionsMonitor. Inject and store IOptionsMonitor<Options> and use options.CurrentValue or register OnChange callback. 
+```
+_options = options.CurrentValue;
+options.OnChange(config => {
+	_options = config;
+	logger.LogInformation("Configuration has been updated");
+});
+```
