@@ -377,6 +377,7 @@ public class Startup
 ```
 
 ## Configuration
+* .ValidateDataAnnotations validates config on first use. Better to use IStartupFilter to validate on application startup.
 * Use IOptions. Cannot register named instances.
 * For reloading inside non-singleton services use IOptionsSnapshot. Can register named instances.
 * For reloading inside singleton services use IOptionsMonitor. Inject and store IOptionsMonitor<Options> and use options.CurrentValue or register OnChange callback. Can register named instances.
