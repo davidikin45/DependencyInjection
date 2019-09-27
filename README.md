@@ -377,9 +377,9 @@ public class Startup
 ```
 
 ## Configuration
-* Use IOptions
-* For reloading inside non-singleton services use IOptionsSnapshot
-* For reloading inside singleton services use IOptionsMonitor. Inject and store IOptionsMonitor<Options> and use options.CurrentValue or register OnChange callback. 
+* Use IOptions. Cannot register named instances.
+* For reloading inside non-singleton services use IOptionsSnapshot. Can register named instances.
+* For reloading inside singleton services use IOptionsMonitor. Inject and store IOptionsMonitor<Options> and use options.CurrentValue or register OnChange callback. Can register named instances.
 ```
 _options = options.CurrentValue;
 options.OnChange(config => {
