@@ -412,7 +412,11 @@ options.OnChange(config => {
 * Can be injected into all service lifetimes
 * Supports named options
 
-### Providers
+### Host Config Providers
+1. Environment variables prefixed with . Previously was ASPNETCORE_
+2. Command line args
+
+### App Config Providers
 1. appsettings.json
 2. appsettings.{environment}.json
 3. Local user secrets in development environment
